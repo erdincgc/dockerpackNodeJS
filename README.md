@@ -8,14 +8,22 @@ Create the whole development environment.
 
 # Install
 
-Install Docker and [docker-compose](https://docs.docker.com/compose/install/).
+- Install Docker and [docker-compose](https://docs.docker.com/compose/install/).
 On Windows 10 install Docker Toolbox and [disable Hyper-V](http://www.poweronplatforms.com/enable-disable-hyper-v-windows-10-8/).
+
+- cd to parent dir of your project
+- git clone https://github.com/erdincgc/dockerpackNodeJS.git dockerfiles
+- preferably rename project dir as "api" for quick run without configuration
 
 # Project setup
 -Project root
+
 |- api (nodejs api app)
+
 |- dockerfiles (this repo-DO NOT RENAME)
+
 |- socketapi (nodejs socket app -optional)
+
 |- worker (nodejs worker app to consume rabbitMQ -optional)
 
 
