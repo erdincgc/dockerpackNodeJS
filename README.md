@@ -1,4 +1,4 @@
-# docker-compose-nodejs
+# dockerPackNodejs
 
 Docker Compose setup to run NodeJS Apps and MongoDB with RabbitMq
 Includes MongoExpress administration panel 
