@@ -1,5 +1,5 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+#set -e
 #source .env
 export COMPOSE_PROJECT_NAME=zonechat
 export COMPOSE_WEBSERVER=nodejs # nginx / apache2
