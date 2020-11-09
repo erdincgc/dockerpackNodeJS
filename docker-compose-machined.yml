@@ -1,0 +1,114 @@
+version: '2.4'
+
+# Services
+services:
+
+  # API Container
+  api:
+    build:
+      context: ../
+      dockerfile: dockerfiles/nodejs/Dockerfile
+    image: erdinc/nodejs:${APP_NAME}_nodejs
+    container_name: ${APP_NAME}_api
+    ports:
+      - 5000:5000
+      - 9229:9229
+    environment:
+      - SERVER_PORT=5000
+      - DATABASE_CONNECTIONSTRING=mongodb://mongo:${MONGO_PORT}/${APP_NAME}
+    volumes:
+      - ../api/src:/usr/src/app/src
+      - ../../dockerlogs/api:/root/.npm/_logs/
+    command: npm run dev
+    depends_on:
+      - mongodb
+    tty: true
+    networks:
+      default:
+        ipv4_address: ${API_IP}
+
+
+  # API Socket Container
+  # socketapi: 
+
+
+  # Queue Worker Container
+  # worker:
+
+
+  # Queue Container
+  queue:
+    image: rabbitmq:3-management
+    hostname: rabbit${APP_NAME}
+    ports:
+      - 5672:5672
+      - 15672:15672   
+    image: erdinc/rabbitmq:${APP_NAME}_rabbitmq
+    container_name: ${APP_NAME}_queue
+    #depends_on:
+    #      - redis
+    networks:
+      default:
+        ipv4_address: ${QUEUE_IP}
+
+
+  # Mongo Container
+  mongodb:
+    container_name: ${APP_NAME}_mongo
+    image: mongo
+    restart: always
+    ports:
+      - "${MONGO_PORT}:${MONGO_PORT}"
+    volumes:
+      - mongodbdata:/data/db
+      - ../../dockerlogs/mongo:/mnt/sda1/var/lib/docker/containers/
+    environment:
+        MONGO_INITDB_ROOT_USERNAME: root
+        MONGO_INITDB_ROOT_PASSWORD: zone321
+        MONGO_INITDB_DATABASE: project
+    networks:
+      default:
+        ipv4_address: ${MONGO_IP}
+ 
+ 
+  mongo-express:
+    container_name: ${APP_NAME}_mongoexpress
+    image: mongo-express
+    restart: always
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: root
+      ME_CONFIG_BASICAUTH_PASSWORD: zone321
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: zone321
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      #ME_CONFIG_MONGODB_PORT`          | `27017`     
+      #ME_CONFIG_MONGODB_URL`           | `mongodb://admin:pass@localhost:27017/db?ssl=false`
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+    ports:
+      - 8081:8081
+    networks:
+      default:
+        ipv4_address: ${MONGO_EXPRESS_IP}
+
+
+
+# Volumes
+volumes:
+  mongodbdata:
+    driver: local
+
+# Networks
+networks:
+  default:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+    ipam:
+      driver: default
+      config:
+        - subnet: ${NETWORK_SUBNET}
+          gateway: ${NETWORK_GATEWAY}
